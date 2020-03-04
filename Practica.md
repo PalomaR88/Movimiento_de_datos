@@ -293,9 +293,196 @@ El trabajo "SYSTEM"."SYS_EXPORT_FULL_01" ha terminado correctamente en Mar Mar 3
 
 
 
-
-
-
 ### 4. Intenta realizar operaciones similares de importación y exportación con las herramientas proporcionadas con Postgres desde línea de comandos, documentando el proceso.
+
+En PostgreSQL hay tres formas de exportar e importar una base de datos o parte de ella que son:
+- A través de un fichero con extensión .dump o .sql.
+- A través de phpPgAdmin.
+
+
+#### Exportación a través de ficheros
+Como se ha dicho anteriormente las exportaciones o importaciones se pueden realizar a través de fichero .dump o .sql. 
+
+La sintaxis es la siguiente:
+~~~
+pg_dump -Fc -t <nombre_tabla> <nombre_BDD> -f /<ruta_fichero>.dump
+~~~
+
+En nuestro ejemplo se va a exportar la tabla aspectos de la base de datos paloma:
+~~~
+postgres@servidor:/home/vagrant$ pg_dump -Fc -t aspectos paloma -f /home/postgres/aspectos.dump
+~~~
+
+Para exportar con ficheros .sql la sintaxis es casi la misma:
+~~~
+pg_dump <nombre_BDD> -t <nombre_tabla> > /<ruta_fichero>.sql
+~~~
+
+El ejemplo, con la misma tabla y base de datos que anteriomente, es:
+~~~
+postgres@servidor:/home/postgres$ pg_dump paloma -t aspectos > /home/postgres/aspectos.sql
+~~~
+
+La diferencia entre estos ficheros es que en .sql el texto es plano:
+~~~
+postgres@servidor:/home/postgres$ cat aspectos.sql 
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 11.7 (Debian 11.7-0+deb10u1)
+-- Dumped by pg_dump version 11.7 (Debian 11.7-0+deb10u1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: aspectos; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.aspectos (
+    codigo character varying(3) NOT NULL,
+    descripcion character varying(50),
+    importancia character varying(8),
+    CONSTRAINT importancia_format CHECK ((upper((importancia)::text) = ANY (ARRAY['MUY ALTA'::text, 'ALTA'::text, 'MEDIA'::text, 'BAJA'::text]))),
+    CONSTRAINT nulo_descrcipcion_asp CHECK ((descripcion IS NOT NULL))
+);
+
+
+ALTER TABLE public.aspectos OWNER TO postgres;
+
+--
+-- Data for Name: aspectos; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.aspectos (codigo, descripcion, importancia) FROM stdin;
+COL	Color	Baja
+TEX	Textura	Alta
+VOL	Volumen	Media
+CAN	Cantidad	Alta
+PRE	Presentacion	Alta
+TEC	Tecnica	Media
+ORI	Originalidad	media
+\.
+
+
+--
+-- Name: aspectos pri_aspectos; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.aspectos
+    ADD CONSTRAINT pri_aspectos PRIMARY KEY (codigo);
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+~~~
+
+~~~
+postgres@servidor:/home/postgres$ cat aspectos.dump 
+PGDMP
+�xpaloma11.7 (Debian 11.7-0+deb10u1)11.7 (Debian 11.7-0+deb10u1�
+                                                                0ENCODINENCODINGSET client_encoding = 'UTF8';
+false�
+      00
+STDSTRINGS
+STDSTRINGS(SET standard_conforming_strings = 'on';
+false�
+      00
+SEARCHPATH
+SEARCHPATH8SELECT pg_catalog.set_config('search_path', '', false);
+false�
+      126216385palomDATABASExCREATE DATABASE paloma WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US.UTF-8' LC_CTYPE = 'en_US.UTF-8';
+DROP DATABASE paloma;
+postgresfalse�
+              00DATABASE palomaACL,GRANT CONNECT ON DATABASE paloma TO paloma;
+postgresfalse2976�12595772aspectosTABLEsCREATE TABLE public.aspectos (
+    codigo character varying(3) NOT NULL,
+    descripcion character varying(50),
+    importancia character varying(8),
+    CONSTRAINT importancia_format CHECK ((upper((importancia)::text) = ANY (ARRAY['MUY ALTA'::text, 'ALTA'::text, 'MEDIA'::text, 'BAJA'::text]))),
+    CONSTRAINT nulo_descrcipcion_asp CHECK ((descripcion IS NOT NULL))
+);
+DROP TABLE public.aspectos;
+publipostgresfalse�
+                   05772aspectos
+TABLE DATADCOPY public.aspectos (codigo, descripcion, importancia) FROM stdin;
+publipostgresfalse20 
+                     260657734aspectos pri_aspectos
+CONSTRAINTWALTER TABLE ONLY public.aspectos
+    ADD CONSTRAINT pri_aspectos PRIMARY KEY (codigo);
+?ALTER TABLE ONLY public.aspectos DROP CONSTRAINT pri_aspectos;
+publipostgresfalse206�
+                      ux�-�A
+�0E�3��5d!�)%n>� #�b
+wr���،����G�#i��Fﶫd��/�t�������ˎ�'f���*�
+~~~
+
+Para exportar la sintaxis es:
+~~~
+psql -U <usuario> -W -h <hostname> <nombre_BDD> < <fichero_origen>.sql
+~~~
+
+A continuación, un ejemplo de la importación de la table aspectos, antes exportada, en una base de datos de prueba:
+~~~
+postgres@servidor:/home/postgres$ psql -U postgres -W -h localhost pruebaora < aspectos.sql 
+Password: 
+SET
+SET
+SET
+SET
+SET
+ set_config 
+------------
+ 
+(1 row)
+
+SET
+SET
+SET
+SET
+SET
+SET
+CREATE TABLE
+ALTER TABLE
+COPY 7
+ALTER TABLE
+~~~
+
+> Comprobación:
+~~~
+pruebaora=# \d
+          List of relations
+ Schema |   Name   | Type  |  Owner   
+--------+----------+-------+----------
+ public | aspectos | table | postgres
+(1 row)
+~~~
+
+
+#### Importación con phpPgAdmin
+Tras insertar el usuario y la contraseña, en nuestro caso del usuario Postgres, se selecciona la base de datos, pruebaora. En la máquina donde está abierta la interfaz web hay un fichero .sql con la tabla versiones. Se clicka sobre el botón Examinar... y se selecciona dicho fichero:
+[postgres](images/bimg.png)
+
+Al pulsar Ejecutar el resultado es el mismo que si se realiza desde la línea de comandos del sistema origen. En este caso, indica los errores al isnertar los datos, puesto que se ha exportado una clausula de clave foránea de una tabla que en esta base de datos no existe. 
+[postgres](images/aimg.png)
+
+Y ahora en la base de datos pruebaora aparece la nueva tabla creada:
+[postgres](images/cimg.png)
+
 
 ### 5. Exporta los documentos de una colección de MongoDB que cumplan una determinada condición e impórtalos en otra base de datos.
