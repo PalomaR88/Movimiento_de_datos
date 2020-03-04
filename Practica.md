@@ -476,13 +476,13 @@ pruebaora=# \d
 
 #### Importación con phpPgAdmin
 Tras insertar el usuario y la contraseña, en nuestro caso del usuario Postgres, se selecciona la base de datos, pruebaora. En la máquina donde está abierta la interfaz web hay un fichero .sql con la tabla versiones. Se clicka sobre el botón Examinar... y se selecciona dicho fichero:
-[postgres](images/bimg.png)
+![postgres](images/bimg.png)
 
 Al pulsar Ejecutar el resultado es el mismo que si se realiza desde la línea de comandos del sistema origen. En este caso, indica los errores al isnertar los datos, puesto que se ha exportado una clausula de clave foránea de una tabla que en esta base de datos no existe. 
-[postgres](images/aimg.png)
+![postgres](images/aimg.png)
 
 Y ahora en la base de datos pruebaora aparece la nueva tabla creada:
-[postgres](images/cimg.png)
+![postgres](images/cimg.png)
 
 
 ### 5. Exporta los documentos de una colección de MongoDB que cumplan una determinada condición e impórtalos en otra base de datos.
