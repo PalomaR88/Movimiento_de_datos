@@ -481,8 +481,7 @@ Tras insertar el usuario y la contraseña, en nuestro caso del usuario Postgres,
 Al pulsar Ejecutar el resultado es el mismo que si se realiza desde la línea de comandos del sistema origen. En este caso, indica los errores al isnertar los datos, puesto que se ha exportado una clausula de clave foránea de una tabla que en esta base de datos no existe. 
 ![postgres](images/aimg.png)
 
-Y ahora en la base de datos pruebaora aparece la nueva tabla creada:
-![postgres](images/cimg.png)
+Y ahora en la base de datos pruebaora aparece la nueva tabla creada.
 
 
 ### 5. Exporta los documentos de una colección de MongoDB que cumplan una determinada condición e impórtalos en otra base de datos.
